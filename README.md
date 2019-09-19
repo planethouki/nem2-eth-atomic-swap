@@ -1,6 +1,13 @@
 # nem2-eth-atomic-swap
 
-> nem2 eth atomic swap example
+catapult(private)-ethereum(ropsten) atomic swap simple web ui
+
+do not use for mainnet or production
+
+## リソース
+
+- Ethereum Contract https://github.com/chatch/hashed-timelock-contract-ethereum
+- NEM Catapult Private Network https://github.com/tech-bureau/catapult-service-bootstrap
 
 ## Build Setup
 
@@ -20,4 +27,4 @@ $ npm run generate
 ```
 
 For detailed explanation on how things work, check out [Nuxt.js docs](https://nuxtjs.org).
-# nem2-eth-atomic-swap
+
