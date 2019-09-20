@@ -6,16 +6,19 @@
     <div>
       <b-form-group label="">
         <b-form-radio v-model="selected" name="role-radios" value="Alice"
-          >Alice: Send XEM, Receive ETH.</b-form-radio
+          >Alice: Send <span class="badge badge-nem">XEM</span>, Receive
+          <span class="badge badge-eth">ETH</span>.</b-form-radio
         >
         <b-form-radio v-model="selected" name="role-radios" value="Bob"
-          >Bob: Send ETH, Receive XEM.</b-form-radio
+          >Bob: Send <span class="badge badge-eth">ETH</span>, Receive
+          <span class="badge badge-nem">XEM</span>.</b-form-radio
         >
       </b-form-group>
       <div class="mt-3">
         Selected: <strong>{{ selected }}</strong>
       </div>
       <div class="mt-3">
+        <b-button variant="outline-secondary" to="/">Back</b-button>
         <b-button variant="outline-primary" @click="submit">Next</b-button>
       </div>
     </div>
