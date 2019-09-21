@@ -1,12 +1,16 @@
 <template>
   <div>
-    <h1 class="title">
-      Account Settings
-    </h1>
+    <h1 class="title">Account Settings ({{ role }} Role)</h1>
+    <p>
+      <b-button variant="secondary" size="sm" @click="usePreset"
+        >Use Preset</b-button
+      >
+      <b-button variant="outline-secondary" size="sm" @click="clearInput"
+        >Clear</b-button
+      >
+    </p>
     <div>
-      <h2>
-        Put Your Private Keys
-      </h2>
+      <h2>{{ role }} Private Keys</h2>
       <b-form-group
         id="your-nem-form"
         label-cols="4"
@@ -97,9 +101,7 @@
       </b-form-group>
     </div>
     <div class="mt-3">
-      <h2>
-        Put Counterparty's Addresses
-      </h2>
+      <h2>{{ counterparty }} Addresses</h2>
       <b-form-group
         id="cp-nem-form"
         label-cols="4"
@@ -172,9 +174,11 @@
       </b-form-group>
     </div>
     <div>
-      <b-button variant="secondary" @click="usePreset">Use Preset</b-button>
-      <b-button variant="secondary" @click="clearInput">Clear</b-button>
-      <b-button variant="primary" :disabled="!isEnableGoNext" @click="goNext"
+      <b-button variant="outline-secondary" to="/role">Back</b-button>
+      <b-button
+        variant="outline-primary"
+        :disabled="!isEnableGoNext"
+        @click="goNext"
         >Next</b-button
       >
     </div>
@@ -188,22 +192,28 @@ export default {
     return {
       nemPrivateKey: '',
       nemAddress: '',
+      nemBalance: null,
+      nemLoading: false,
       ethPrivateKey: '',
       ethAddress: '',
-      cpNemAddress: '',
-      cpEthAddress: '',
-      nemBalance: null,
-      cpNemBalance: null,
       ethBalance: null,
-      cpEthBalance: null,
-      isEnableGoNext: false,
-      nemLoading: false,
       ethLoading: false,
+      cpNemAddress: '',
+      cpNemBalance: null,
       cpNemLoading: false,
-      cpEthLoading: false
+      cpEthAddress: '',
+      cpEthBalance: null,
+      cpEthLoading: false,
+      isEnableGoNext: false
     }
   },
   computed: {
+    role() {
+      return this.$store.state.role
+    },
+    counterparty() {
+      return this.$store.state.role === 'Alice' ? 'Bob' : 'Alice'
+    },
     nemValidationStatus() {
       if (this.nemLoading) {
         return { message: '', icon: '&#x2754;' }
@@ -214,13 +224,9 @@ export default {
       if (this.nemBalance === null) {
         return { message: 'Invalid Private Key', icon: '&#x274C;' }
       }
-      if (this.$store.state.role === 'Alice') {
-        return this.nemBalance > 0
-          ? { message: 'OK', icon: '&#x2705;' }
-          : { message: 'Balance must not be 0', icon: '&#x274C;' }
-      } else {
-        return { message: 'OK', icon: '&#x2705;' }
-      }
+      return this.nemBalance > 0
+        ? { message: 'OK', icon: '&#x2705;' }
+        : { message: 'Balance must not be 0', icon: '&#x274C;' }
     },
     ethValidationStatus() {
       if (this.ethLoading) {
@@ -232,13 +238,9 @@ export default {
       if (this.ethBalance === null) {
         return { message: 'Invalid Private Key', icon: '&#x274C;' }
       }
-      if (this.$store.state.role === 'Alice') {
-        return { message: 'OK', icon: '&#x2705;' }
-      } else {
-        return this.ethBalance > 0
-          ? { message: 'OK', icon: '&#x2705;' }
-          : { message: 'Balance must not be 0', icon: '&#x274C;' }
-      }
+      return this.ethBalance > 0
+        ? { message: 'OK', icon: '&#x2705;' }
+        : { message: 'Balance must not be 0', icon: '&#x274C;' }
     },
     cpNemValidationStatus() {
       if (this.cpNemLoading) {
@@ -250,13 +252,9 @@ export default {
       if (this.cpNemBalance === null) {
         return { message: 'Invalid Address', icon: '&#x274C;' }
       }
-      if (this.$store.state.role === 'Alice') {
-        return { message: 'OK', icon: '&#x2705;' }
-      } else {
-        return this.cpNemBalance > 0
-          ? { message: 'OK', icon: '&#x2705;' }
-          : { message: 'Balance must not be 0', icon: '&#x274C;' }
-      }
+      return this.cpNemBalance > 0
+        ? { message: 'OK', icon: '&#x2705;' }
+        : { message: 'Balance must not be 0', icon: '&#x274C;' }
     },
     cpEthValidationStatus() {
       if (this.cpEthLoading) {
@@ -268,13 +266,9 @@ export default {
       if (this.cpEthBalance === null) {
         return { message: 'Invalid Private Key', icon: '&#x274C;' }
       }
-      if (this.$store.state.role === 'Alice') {
-        return this.cpEthBalance > 0
-          ? { message: 'OK', icon: '&#x2705;' }
-          : { message: 'Balance must not be 0', icon: '&#x274C;' }
-      } else {
-        return { message: 'OK', icon: '&#x2705;' }
-      }
+      return this.cpEthBalance > 0
+        ? { message: 'OK', icon: '&#x2705;' }
+        : { message: 'Balance must not be 0', icon: '&#x274C;' }
     }
   },
   watch: {
@@ -290,6 +284,7 @@ export default {
       } else {
         this.nemAddress = ''
         this.nemBalance = null
+        this.checkNext()
         this.nemLoading = false
       }
     },
@@ -305,6 +300,7 @@ export default {
       } else {
         this.ethAddress = ''
         this.ethBalance = null
+        this.checkNext()
         this.ethLoading = false
       }
     },
@@ -318,6 +314,7 @@ export default {
         })
       } else {
         this.cpNemBalance = null
+        this.checkNext()
         this.cpNemLoading = false
       }
     },
@@ -331,6 +328,7 @@ export default {
         })
       } else {
         this.cpEthBalance = null
+        this.checkNext()
         this.cpEthLoading = false
       }
     }
@@ -367,25 +365,20 @@ export default {
       this.ethPrivateKey = ''
       this.cpNemAddress = ''
       this.cpEthAddress = ''
+      this.checkNext()
     },
     checkNext() {
-      if (this.$store.state.role === 'Alice') {
+      this.isEnableGoNext = false
+      this.$nextTick(() => {
         if (
           this.nemBalance !== null &&
-          this.ethAddress &&
+          this.ethBalance !== null &&
           this.cpEthBalance !== null &&
-          this.cpNemAddress
+          this.cpNemBalance !== null
         ) {
           this.isEnableGoNext = true
         }
-      } else if (
-        this.nemAddress &&
-        this.ethBalance !== null &&
-        this.cpEthAddress &&
-        this.cpNemBalance !== null
-      ) {
-        this.isEnableGoNext = true
-      }
+      })
     },
     goNext() {
       this.store()

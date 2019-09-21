@@ -12,11 +12,12 @@ import {
   SecretLockTransaction,
   SecretProofTransaction,
   TransactionHttp,
+  TransactionType,
   UInt64
 } from 'nem2-sdk'
 import { keccak256 } from 'js-sha3'
 import { randomBuffer } from 'secure-random'
-import { filter, timeout } from 'rxjs/operators'
+import { filter, timeout, mergeMap } from 'rxjs/operators'
 
 export default ({ app, store }, inject) => {
   inject('nem', {
@@ -45,6 +46,18 @@ export default ({ app, store }, inject) => {
         NetworkType.MIJIN_TEST
       ).address.plain()
     },
+    keccac256(hex) {
+      return keccak256
+        .create()
+        .update(Buffer.from(hex, 'hex'))
+        .hex()
+        .toUpperCase()
+    },
+    generateRandom() {
+      return randomBuffer(32)
+        .toString('hex')
+        .toUpperCase()
+    },
     getXemBalance(addressString) {
       const networkHttp = new NetworkHttp(process.env.nemEndpoint)
       const accountHttp = new AccountHttp(process.env.nemEndpoint, networkHttp)
@@ -71,17 +84,7 @@ export default ({ app, store }, inject) => {
           return 0
         })
     },
-    sendSecretLock() {
-      const privateKey = store.state.nemPrivateKey
-      const address = store.state.cpNemAddress
-      const proofBuffer = randomBuffer(32)
-      const secret = keccak256
-        .create()
-        .update(proofBuffer)
-        .hex()
-        .toUpperCase()
-      store.commit('setProof', proofBuffer.toString('hex').toUpperCase())
-      store.commit('setSecret', secret)
+    sendSecretLock(secret, recipientAddress, privateKey) {
       const deadLine = Deadline.create()
       const mosaic = new Mosaic(
         new MosaicId(process.env.xemMosaicHexId),
@@ -89,7 +92,7 @@ export default ({ app, store }, inject) => {
       )
       const duration = UInt64.fromUint(1000)
       const hashType = HashType.Op_Keccak_256
-      const recipient = Address.createFromRawAddress(address)
+      const recipient = Address.createFromRawAddress(recipientAddress)
       const networkType = NetworkType.MIJIN_TEST
       const maxFee = UInt64.fromUint(200000)
       const secretLockTransaction = SecretLockTransaction.create(
@@ -108,7 +111,7 @@ export default ({ app, store }, inject) => {
         process.env.nemGenerationHash
       )
       const transactionHttp = new TransactionHttp(process.env.nemEndpoint)
-      transactionHttp.announce(signedTransaction).toPromise()
+      transactionHttp.announce(signedTransaction)
       return signedTransaction.hash
     },
     sendSecretProof() {
@@ -181,6 +184,77 @@ export default ({ app, store }, inject) => {
           )
       })
     },
-    findSecretLockFromRecipientAddress({ senderAddress, recipientAddress }) {}
+    async waitAndFindSecretLockConfirmed(recipientAddress, secret) {
+      const returnObject = {
+        hash: '',
+        secret: ''
+      }
+      const recipient = Address.createFromRawAddress(recipientAddress)
+      for (let i = 0; i < 100; i++) {
+        const accountHttp = new AccountHttp(
+          process.env.nemEndpoint,
+          new NetworkHttp(process.env.nemEndpoint)
+        )
+        const transactions = await accountHttp
+          .getAccountInfo(recipient)
+          .pipe(
+            mergeMap((accountInfo) => {
+              return accountHttp.incomingTransactions(accountInfo.publicAccount)
+            })
+          )
+          .toPromise()
+        const transactionsFiltered = transactions
+          .filter((transaction) => {
+            return transaction.type === TransactionType.SECRET_LOCK
+          })
+          .filter((transaction) => {
+            return transaction.recipient.equals(recipient)
+          })
+          .filter((transaction) => {
+            return transaction.secret === secret
+          })
+        if (transactionsFiltered.length === 1) {
+          returnObject.hash = transactionsFiltered[0].transactionInfo.hash
+          returnObject.secret = transactionsFiltered[0].secret
+          return Promise.resolve(returnObject)
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+      }
+      return Promise.reject(new Error('timeout'))
+    },
+    async waitAndFindSecretProofConfirmed(recipientAddress, secret) {
+      const recipient = Address.createFromRawAddress(recipientAddress)
+      let hash
+      for (let i = 0; i < 1000; i++) {
+        const accountHttp = new AccountHttp(
+          process.env.nemEndpoint,
+          new NetworkHttp(process.env.nemEndpoint)
+        )
+        const transactions = await accountHttp
+          .getAccountInfo(recipient)
+          .pipe(
+            mergeMap((accountInfo) => {
+              return accountHttp.incomingTransactions(accountInfo.publicAccount)
+            })
+          )
+          .toPromise()
+        const transactionsFiltered = transactions
+          .filter((transaction) => {
+            return transaction.type === TransactionType.SECRET_PROOF
+          })
+          .filter((transaction) => {
+            return transaction.recipient.equals(recipient)
+          })
+          .filter((transaction) => {
+            return transaction.secret === secret
+          })
+        if (transactionsFiltered.length === 1) {
+          hash = transactionsFiltered[0].transactionInfo.hash
+          return Promise.resolve(hash)
+        }
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+      }
+      return Promise.reject(new Error('timout'))
+    }
   })
 }

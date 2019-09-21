@@ -6,14 +6,21 @@
     <div class="mt-3">
       <b-card
         :border-variant="variant1"
-        header="Step 1"
         :header-bg-variant="variant1"
         header-text-variant="white"
         align="center"
       >
-        <b-card-text>Alice locks XEM.</b-card-text>
-        <b-card-text>{{ hash1 }}</b-card-text>
-        <b-card-text>{{ message1 }}</b-card-text>
+        <template v-slot:header>
+          <b-badge>Step1</b-badge>
+          <span>Alice locks XEM.</span>
+          <b-spinner
+            v-show="variant1 === 'primary'"
+            label="step1 executing"
+            small
+          ></b-spinner>
+        </template>
+        <b-card-text>Transaction Hash : {{ hash1 }}</b-card-text>
+        <b-card-text>Message : {{ message1 }}</b-card-text>
         <b-input-group prepend="secret">
           <b-form-input v-model="secret1" :disabled="disabled1"></b-form-input>
           <b-input-group-append>
@@ -25,36 +32,60 @@
       </b-card>
       <b-card
         :border-variant="variant2"
-        header="Step 2"
         :header-bg-variant="variant2"
         header-text-variant="white"
         align="center"
       >
+        <template v-slot:header>
+          <b-badge>Step2</b-badge>
+          <span>Bob locks ETH.</span>
+          <b-spinner
+            v-show="variant2 === 'primary'"
+            label="step2 executing"
+            small
+          ></b-spinner>
+        </template>
         <b-card-text>Bob locks ETH.</b-card-text>
-        <b-card-text>{{ hash2 }}</b-card-text>
-        <b-card-text>{{ message2 }}</b-card-text>
+        <b-card-text>Transaction Hash : {{ hash2 }}</b-card-text>
+        <b-card-text>Message : {{ message2 }}</b-card-text>
       </b-card>
       <b-card
         :border-variant="variant3"
-        header="Step 3"
         :header-bg-variant="variant3"
         header-text-variant="white"
         align="center"
       >
+        <template v-slot:header>
+          <b-badge>Step3</b-badge>
+          <span>Alice unlocks ETH.</span>
+          <b-spinner
+            v-show="variant3 === 'primary'"
+            label="step3 executing"
+            small
+          ></b-spinner>
+        </template>
         <b-card-text>Alice unlocks ETH.</b-card-text>
-        <b-card-text>{{ hash3 }}</b-card-text>
-        <b-card-text>{{ message3 }}</b-card-text>
+        <b-card-text>Transaction Hash : {{ hash3 }}</b-card-text>
+        <b-card-text>Message : {{ message3 }}</b-card-text>
       </b-card>
       <b-card
         :border-variant="variant4"
-        header="Step 4"
         :header-bg-variant="variant4"
         header-text-variant="white"
         align="center"
       >
+        <template v-slot:header>
+          <b-badge>Step4</b-badge>
+          <span>Bob unlocks XEM.</span>
+          <b-spinner
+            v-show="variant4 === 'primary'"
+            label="step4 executing"
+            small
+          ></b-spinner>
+        </template>
         <b-card-text>Bob unlocks XEM.</b-card-text>
-        <b-card-text>{{ hash4 }}</b-card-text>
-        <b-card-text>{{ message4 }}</b-card-text>
+        <b-card-text>Transaction Hash : {{ hash4 }}</b-card-text>
+        <b-card-text>Message : {{ message4 }}</b-card-text>
       </b-card>
     </div>
   </div>
@@ -62,10 +93,6 @@
 
 <script>
 import { series } from 'async'
-import { AccountHttp, Address, NetworkHttp, TransactionType } from 'nem2-sdk'
-import { mergeMap } from 'rxjs/operators'
-import Web3 from 'web3'
-import abi from '~/assets/abi'
 
 export default {
   components: {},
@@ -104,128 +131,71 @@ export default {
       }
     },
     bobScenario() {
-      const aliceAddress = this.$store.state.cpNemAddress
-      const bobAddress = this.$nem.privateKeyToAddress(
-        this.$store.state.nemPrivateKey
-      )
       series({
         step1: async (done) => {
           this.variant1 = 'primary'
-          const inputSecret = this.secret1
-          for (let i = 0; i < 100; i++) {
-            const accountHttp = new AccountHttp(
-              process.env.nemEndpoint,
-              new NetworkHttp(process.env.nemEndpoint)
-            )
-            const transactions = await accountHttp
-              .getAccountInfo(Address.createFromRawAddress(aliceAddress))
-              .pipe(
-                mergeMap((accountInfo) => {
-                  return accountHttp.transactions(accountInfo.publicAccount)
-                })
-              )
-              .toPromise()
-            const transactionsFiltered = transactions
-              .filter((transaction) => {
-                return transaction.type === TransactionType.SECRET_LOCK
-              })
-              .filter((transaction) => {
-                return transaction.recipient.equals(
-                  Address.createFromRawAddress(bobAddress)
-                )
-              })
-              .filter((transaction) => {
-                return transaction.secret === inputSecret
-              })
-            if (transactionsFiltered.length === 1) {
-              console.log('transactionsFiltered', transactionsFiltered)
-              this.hash1 = transactionsFiltered[0].transactionInfo.hash
-              this.$store.commit('setSecret', transactionsFiltered[0].secret)
-              this.variant1 = 'success'
-              break
-            }
-            await new Promise((resolve) => setTimeout(resolve, 1000))
-          }
+          this.message1 =
+            "Waiting for Alice's sent SecretLock tx to be confirmed."
+          const result = await this.$nem.waitAndFindSecretLockConfirmed(
+            this.$nem.privateKeyToAddress(this.$store.state.nemPrivateKey),
+            this.secret1
+          )
+          this.hash1 = result.hash
+          this.$store.commit('setSecret', result.secret)
+          this.variant1 = 'success'
+          this.message1 = 'Confirmed.'
           done()
         },
         step2: async (done) => {
           this.variant2 = 'primary'
-          const web3 = new Web3(process.env.ethEndpoint)
-          const account = web3.eth.accounts.privateKeyToAccount(
-            this.$store.state.ethPrivateKey
+          await this.$eth.sendNewContractAndWaitConfirmed(
+            this.$store.state.ethPrivateKey,
+            this.$store.state.secret,
+            this.$store.state.cpEthAddress,
+            (error, transactionHash) => {
+              if (error) {
+                this.message2 = error.message
+                console.error(error)
+              }
+              this.message2 = 'Transaction sent. Waiting for confirm.'
+              this.hash2 = transactionHash
+            }
           )
-          web3.eth.accounts.wallet.add(account)
-          web3.eth.defaultAccount = account.address
-          const contract = new web3.eth.Contract(
-            abi,
-            process.env.ethSwapContractAddress
-          )
-          const receipt = await contract.methods
-            .newContract(
-              this.$store.state.cpEthAddress,
-              `0x${this.$store.state.secret}`,
-              Math.ceil(Date.now() / 1000) + 60 * 60 * 48
-            )
-            .send({
-              from: account.address,
-              gas: 150000,
-              gasPrice: 15000000000,
-              value: 1
-            })
-          this.hash2 = receipt.transactionHash
+          this.message2 = 'Confirmed.'
           this.variant2 = 'success'
           done()
         },
         step3: async (done) => {
           this.variant3 = 'primary'
-          const web3 = new Web3(process.env.ethEndpoint)
-          const contract = new web3.eth.Contract(
-            abi,
-            process.env.ethSwapContractAddress
+          this.message3 =
+            "Waiting for Alice's sent transaction to be confirmed."
+          const result = await this.$eth.waitLogHTLCWithdrawEvent(
+            this.$store.state.secret
           )
-          const secret = `0x${this.$store.state.secret.toLowerCase()}`
-          const currentBlockNumber = await web3.eth.getBlockNumber()
-          for (let i = 0; i < 1000; i++) {
-            await new Promise((resolve) => setTimeout(resolve, 1000))
-            const events = await contract.getPastEvents(
-              'LogHTLCWithdraw',
-              {
-                fromBlock: currentBlockNumber - 1000
-              },
-              (error) => {
-                if (error) console.error(error)
-              }
-            )
-            for (let j = 0; j < events.length; j++) {
-              const event = events[j]
-              const contractId = event.returnValues.contractId
-              const getContract = await contract.methods
-                .getContract(contractId)
-                .call()
-              if (getContract.hashlock === secret) {
-                this.$store.commit('setContractId', contractId)
-                this.hash3 = event.transactionHash
-                break
-              }
-            }
-            if (this.hash3 !== null) {
-              break
-            }
-          }
-          const preImage = await contract.methods
-            .getContract(this.$store.state.contractId)
-            .call()
-            .then((result) => {
-              return result.preimage
-            })
-          this.$store.commit('setProof', preImage.substr(2).toUpperCase())
+          this.$store.commit('setContractId', result.contractId)
+          this.$store.commit(
+            'setProof',
+            result.preImage.substr(2).toUpperCase()
+          )
+          this.hash3 = result.transactionHash
           this.variant3 = 'success'
+          this.message3 = 'Confirmed.'
           done()
         },
-        step4: (done) => {
+        step4: async (done) => {
           this.variant4 = 'primary'
+          this.message4 = 'Preparing for SecretProof Tx.'
           this.hash4 = this.$nem.sendSecretProof()
-          this.variant4 = 'success'
+          this.message4 = 'SecretProof Tx was sent successfully.'
+          await this.$nem
+            .waitForConfirmed(
+              this.$nem.privateKeyToAddress(this.$store.state.nemPrivateKey),
+              this.hash4
+            )
+            .then(() => {
+              this.variant4 = 'success'
+              this.message4 = 'Confirmed.'
+            })
           done()
         }
       })

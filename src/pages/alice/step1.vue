@@ -1,10 +1,16 @@
 <template>
   <div>
     <h1 class="title">Account Settings ({{ role }} Role)</h1>
+    <p>
+      <b-button variant="secondary" size="sm" @click="usePreset"
+        >Use Preset</b-button
+      >
+      <b-button variant="outline-secondary" size="sm" @click="clearInput"
+        >Clear</b-button
+      >
+    </p>
     <div>
-      <h2>
-        Put Your Private Keys
-      </h2>
+      <h2>{{ role }} Private Keys</h2>
       <b-form-group
         id="your-nem-form"
         label-cols="4"
@@ -95,9 +101,7 @@
       </b-form-group>
     </div>
     <div class="mt-3">
-      <h2>
-        Put Counterparty's Addresses
-      </h2>
+      <h2>{{ counterparty }} Addresses</h2>
       <b-form-group
         id="cp-nem-form"
         label-cols="4"
@@ -170,8 +174,6 @@
       </b-form-group>
     </div>
     <div>
-      <b-button variant="secondary" @click="usePreset">Use Preset</b-button>
-      <b-button variant="secondary" @click="clearInput">Clear</b-button>
       <b-button variant="outline-secondary" to="/role">Back</b-button>
       <b-button
         variant="outline-primary"
@@ -208,6 +210,9 @@ export default {
   computed: {
     role() {
       return this.$store.state.role
+    },
+    counterparty() {
+      return this.$store.state.role === 'Alice' ? 'Bob' : 'Alice'
     },
     nemValidationStatus() {
       if (this.nemLoading) {
