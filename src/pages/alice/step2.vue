@@ -20,7 +20,9 @@
         <b-card-text>Proof : {{ proof0 }}</b-card-text>
         <b-card-text>Lock Secret : {{ secret0 }}</b-card-text>
         <b-card-text>Message : {{ message0 }}</b-card-text>
-        <b-button variant="info" @click="submit0">Done</b-button>
+        <b-button variant="info" :disabled="disabled0" @click="submit0"
+          >Done</b-button
+        >
       </b-card>
       <b-card
         :border-variant="variant1"
@@ -163,7 +165,8 @@ export default {
       message4: '',
       proof0: '',
       secret0: '',
-      done0: null
+      done0: null,
+      disabled0: false
     }
   },
   computed: {
@@ -185,6 +188,7 @@ export default {
   methods: {
     submit0() {
       this.variant0 = 'success'
+      this.disabled0 = true
       this.done0()
     },
     aliceScenario() {
@@ -242,10 +246,13 @@ export default {
             (error, transactionHash) => {
               if (error) {
                 console.error(error)
-                this.message3 = error.message
+                this.message3 = error.toString()
+                this.variant3 = 'danger'
+                done(error)
+              } else {
+                this.hash3 = transactionHash
+                this.message3 = 'Transaction sent. Waiting for confirm.'
               }
-              this.hash3 = transactionHash
-              this.message3 = 'Transaction sent. Waiting for confirm.'
             }
           )
           this.message3 = 'Confirmed.'

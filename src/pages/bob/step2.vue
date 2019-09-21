@@ -82,7 +82,6 @@
             hash2
           }}</a>
         </b-card-text>
-        <b-card-text>Transaction Hash : {{ hash2 }}</b-card-text>
         <b-card-text>Message : {{ message2 }}</b-card-text>
       </b-card>
       <b-card
@@ -222,11 +221,14 @@ export default {
             this.$store.state.cpEthAddress,
             (error, transactionHash) => {
               if (error) {
-                this.message2 = error.message
+                this.message2 = error.toString()
                 console.error(error)
+                this.variant2 = 'danger'
+                done(error)
+              } else {
+                this.message2 = 'Transaction sent. Waiting for confirm.'
+                this.hash2 = transactionHash
               }
-              this.message2 = 'Transaction sent. Waiting for confirm.'
-              this.hash2 = transactionHash
             }
           )
           this.message2 = 'Confirmed.'
