@@ -5,6 +5,31 @@
     </h1>
     <div class="mt-3">
       <b-card
+        :border-variant="variant0"
+        :header-bg-variant="variant0"
+        header-text-variant="white"
+        align="center"
+      >
+        <template v-slot:header>
+          <b-badge>Step0</b-badge>
+          <span>Prepare</span>
+          <b-spinner
+            v-show="variant0 === 'primary'"
+            label="step0 executing"
+            small
+          ></b-spinner>
+        </template>
+        <b-input-group prepend="secret" class="mb-3">
+          <b-form-input v-model="secret0" :disabled="disabled0"></b-form-input>
+          <b-input-group-append>
+            <b-button variant="info" :disabled="disabled0" @click="submit0"
+              >Go</b-button
+            >
+          </b-input-group-append>
+        </b-input-group>
+        <b-card-text>Message : {{ message0 }}</b-card-text>
+      </b-card>
+      <b-card
         :border-variant="variant1"
         :header-bg-variant="variant1"
         header-text-variant="white"
@@ -21,14 +46,6 @@
         </template>
         <b-card-text>Transaction Hash : {{ hash1 }}</b-card-text>
         <b-card-text>Message : {{ message1 }}</b-card-text>
-        <b-input-group prepend="secret">
-          <b-form-input v-model="secret1" :disabled="disabled1"></b-form-input>
-          <b-input-group-append>
-            <b-button variant="info" :disabled="disabled1" @click="submit1"
-              >Go</b-button
-            >
-          </b-input-group-append>
-        </b-input-group>
       </b-card>
       <b-card
         :border-variant="variant2"
@@ -98,6 +115,7 @@ export default {
   components: {},
   data() {
     return {
+      variant0: 'secondary',
       variant1: 'secondary',
       variant2: 'secondary',
       variant3: 'secondary',
@@ -106,12 +124,13 @@ export default {
       hash2: null,
       hash3: null,
       hash4: null,
+      message0: '',
       message1: '',
       message2: '',
       message3: '',
       message4: '',
-      secret1: '',
-      disabled1: false
+      secret0: '',
+      disabled0: false
     }
   },
   asyncData({ store, redirect }) {
@@ -122,26 +141,32 @@ export default {
       redirect('/alice/step1')
     }
   },
-  mounted() {},
+  mounted() {
+    this.message0 = 'Enter the secret that Alice told you'
+  },
   methods: {
-    submit1() {
-      if (this.secret1.length === 64) {
-        this.disabled1 = true
+    submit0() {
+      if (this.secret0.length === 64) {
+        this.disabled0 = true
+        this.$store.commit('setSecret', this.secret0)
         this.bobScenario()
       }
     },
     bobScenario() {
       series({
+        step0: (done) => {
+          this.variant0 = 'success'
+          done()
+        },
         step1: async (done) => {
           this.variant1 = 'primary'
           this.message1 =
             "Waiting for Alice's sent SecretLock tx to be confirmed."
           const result = await this.$nem.waitAndFindSecretLockConfirmed(
             this.$nem.privateKeyToAddress(this.$store.state.nemPrivateKey),
-            this.secret1
+            this.$store.state.secret
           )
           this.hash1 = result.hash
-          this.$store.commit('setSecret', result.secret)
           this.variant1 = 'success'
           this.message1 = 'Confirmed.'
           done()

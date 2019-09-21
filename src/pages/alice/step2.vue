@@ -5,6 +5,26 @@
     </h1>
     <div class="mt-3">
       <b-card
+        :border-variant="variant0"
+        :header-bg-variant="variant0"
+        header-text-variant="white"
+        align="center"
+      >
+        <template v-slot:header>
+          <b-badge>Step0</b-badge>
+          <span>Prepare</span>
+          <b-spinner
+            v-show="variant0 === 'primary'"
+            label="step0 executing"
+            small
+          ></b-spinner>
+        </template>
+        <b-card-text>Proof : {{ proof0 }}</b-card-text>
+        <b-card-text>Lock Secret : {{ secret0 }}</b-card-text>
+        <b-card-text>Message : {{ message0 }}</b-card-text>
+        <b-button @click="done0" variant="info">Done</b-button>
+      </b-card>
+      <b-card
         :border-variant="variant1"
         :header-bg-variant="variant1"
         header-text-variant="white"
@@ -20,7 +40,6 @@
           ></b-spinner>
         </template>
         <b-card-text>Transaction Hash : {{ hash1 }}</b-card-text>
-        <b-card-text>Lock Secret : {{ secret1 }}</b-card-text>
         <b-card-text>Message : {{ message1 }}</b-card-text>
       </b-card>
       <b-card
@@ -88,6 +107,7 @@ export default {
   components: {},
   data() {
     return {
+      variant0: 'secondary',
       variant1: 'secondary',
       variant2: 'secondary',
       variant3: 'secondary',
@@ -96,11 +116,14 @@ export default {
       hash2: null,
       hash3: null,
       hash4: null,
+      message0: '',
       message1: '',
       message2: '',
       message3: '',
       message4: '',
-      secret1: ''
+      proof0: '',
+      secret0: '',
+      done0: null
     }
   },
   asyncData({ store, redirect }) {
@@ -117,19 +140,25 @@ export default {
   methods: {
     aliceScenario() {
       series({
+        step0: (done) => {
+          this.variant0 = 'primary'
+          this.proof0 = this.$nem.generateRandom()
+          this.$store.commit('setProof', this.proof0)
+          this.secret0 = this.$nem.keccac256(this.$store.state.proof)
+          this.$store.commit('setSecret', this.secret0)
+          this.variant0 = 'success'
+          this.message0 = 'Please tell above Lock Secret to Bob.'
+          this.done0 = done
+        },
         step1: (done) => {
           this.variant1 = 'primary'
-          this.$store.commit('setProof', this.$nem.generateRandom())
-          const secret = this.$nem.keccac256(this.$store.state.proof)
-          this.$store.commit('setSecret', secret)
-          this.secret1 = secret
           this.hash1 = this.$nem.sendSecretLock(
-            secret,
+            this.$store.state.secret,
             this.$store.state.cpNemAddress,
             this.$store.state.nemPrivateKey
           )
           this.message1 =
-            'SecretLock Tx was sent successfully. Wait for confirmed. Please tell above lock secret to Bob.'
+            'SecretLock Tx was sent successfully. Wait for confirmed.'
           this.$nem
             .waitForConfirmed(
               this.$nem.privateKeyToAddress(this.$store.state.nemPrivateKey),
@@ -137,7 +166,7 @@ export default {
             )
             .then(() => {
               this.variant1 = 'success'
-              this.message1 = 'Confirmed. Please tell above lock secret to Bob.'
+              this.message1 = 'Confirmed.'
               done()
             })
         },
