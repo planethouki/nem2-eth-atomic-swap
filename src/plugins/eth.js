@@ -6,6 +6,9 @@ const contract = new web3.eth.Contract(abi, process.env.ethSwapContractAddress)
 
 export default ({ app }, inject) => {
   inject('eth', {
+    txHashUrl(txHash) {
+      return txHash ? `${process.env.ethExplorerTxUrl}/${txHash}` : ''
+    },
     isAddressValid(addressString) {
       return web3.utils.isAddress(addressString)
     },

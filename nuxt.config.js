@@ -90,6 +90,8 @@ export default {
     xemMosaicHexId: '6DE471A241E7AC7C',
     nemGenerationHash:
       '43AE99FE757451CCF50E5CB372828254CD2CA2B91CBA61F11A2A1C031C09FE15',
-    ethSwapContractAddress: '0x21C0750C4bb2b38c52D997A06EAcBc7Dc48b90eE'
+    ethSwapContractAddress: '0x21C0750C4bb2b38c52D997A06EAcBc7Dc48b90eE',
+    ethExplorerTxUrl: 'https://ropsten.etherscan.io/tx',
+    nemExplorerTxUrl: 'https://elephant2.48gh23s.xyz:3001/transaction'
   }
 }

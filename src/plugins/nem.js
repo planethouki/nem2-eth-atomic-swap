@@ -24,6 +24,12 @@ export default ({ app, store }, inject) => {
     test: (string) => {
       console.log('Okay, another function', string)
     },
+    txHashUrl(txHash) {
+      return txHash ? `${process.env.nemExplorerTxUrl}/${txHash}` : ''
+    },
+    txHashStatusUrl(txHash) {
+      return txHash ? `${process.env.nemExplorerTxUrl}/${txHash}/status` : ''
+    },
     isPrivateKeyValid(privateKeyString) {
       try {
         Account.createFromPrivateKey(privateKeyString, NetworkType.MIJIN_TEST)

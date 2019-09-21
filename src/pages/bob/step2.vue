@@ -1,8 +1,6 @@
 <template>
   <div>
-    <h1 class="title">
-      Progress of Atomic Swap
-    </h1>
+    <h1 class="title">Progress of Atomic Swap ({{ role }} Role)</h1>
     <div class="mt-3">
       <b-card
         :border-variant="variant0"
@@ -44,7 +42,22 @@
             small
           ></b-spinner>
         </template>
-        <b-card-text>Transaction Hash : {{ hash1 }}</b-card-text>
+        <b-card-text>
+          <span>Transaction Hash : </span>
+          <a
+            v-if="variant1 === 'primary'"
+            target="_blank"
+            :href="$nem.txHashStatusUrl(hash1)"
+            >{{ hash1 }}</a
+          >
+          <a
+            v-else-if="variant1 === 'success'"
+            target="_blank"
+            :href="$nem.txHashUrl(hash1)"
+            >{{ hash1 }}</a
+          >
+          <span v-else>{{ hash1 }}</span>
+        </b-card-text>
         <b-card-text>Message : {{ message1 }}</b-card-text>
       </b-card>
       <b-card
@@ -62,7 +75,13 @@
             small
           ></b-spinner>
         </template>
-        <b-card-text>Bob locks ETH.</b-card-text>
+        <b-card-text>
+          <span>Transaction Hash : </span>
+          <span v-if="variant2 === 'secondary'">{{ hash2 }}</span>
+          <a v-else target="_blank" :href="$eth.txHashUrl(hash2)">{{
+            hash2
+          }}</a>
+        </b-card-text>
         <b-card-text>Transaction Hash : {{ hash2 }}</b-card-text>
         <b-card-text>Message : {{ message2 }}</b-card-text>
       </b-card>
@@ -81,8 +100,13 @@
             small
           ></b-spinner>
         </template>
-        <b-card-text>Alice unlocks ETH.</b-card-text>
-        <b-card-text>Transaction Hash : {{ hash3 }}</b-card-text>
+        <b-card-text>
+          <span>Transaction Hash : </span>
+          <span v-if="variant3 === 'secondary'">{{ hash3 }}</span>
+          <a v-else target="_blank" :href="$eth.txHashUrl(hash3)">{{
+            hash3
+          }}</a>
+        </b-card-text>
         <b-card-text>Message : {{ message3 }}</b-card-text>
       </b-card>
       <b-card
@@ -100,8 +124,22 @@
             small
           ></b-spinner>
         </template>
-        <b-card-text>Bob unlocks XEM.</b-card-text>
-        <b-card-text>Transaction Hash : {{ hash4 }}</b-card-text>
+        <b-card-text>
+          <span>Transaction Hash : </span>
+          <a
+            v-if="variant4 === 'primary'"
+            target="_blank"
+            :href="$nem.txHashStatusUrl(hash4)"
+            >{{ hash4 }}</a
+          >
+          <a
+            v-else-if="variant4 === 'success'"
+            target="_blank"
+            :href="$nem.txHashUrl(hash4)"
+            >{{ hash4 }}</a
+          >
+          <span v-else>{{ hash4 }}</span>
+        </b-card-text>
         <b-card-text>Message : {{ message4 }}</b-card-text>
       </b-card>
     </div>
@@ -131,6 +169,11 @@ export default {
       message4: '',
       secret0: '',
       disabled0: false
+    }
+  },
+  computed: {
+    role() {
+      return this.$store.state.role
     }
   },
   asyncData({ store, redirect }) {
