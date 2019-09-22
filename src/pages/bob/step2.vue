@@ -1,6 +1,9 @@
 <template>
   <div>
-    <h1 class="title">Progress of Atomic Swap ({{ role }} Role)</h1>
+    <div class="d-flex justify-content-between align-items-center">
+      <h1 class="title">Progress of Atomic Swap ({{ role }} Role)</h1>
+      <BasicTutorials />
+    </div>
     <div class="mt-3">
       <b-card
         :border-variant="variant0"
@@ -142,14 +145,27 @@
         <b-card-text>Message : {{ message4 }}</b-card-text>
       </b-card>
     </div>
+    <div class="mt-3">
+      <b-button v-b-modal.modal-back>Return to the beginning</b-button>
+      <b-modal
+        id="modal-back"
+        title="Return to the beginning"
+        @ok="$router.push('/')"
+      >
+        <p class="my-4">Previous operations will be lost</p>
+      </b-modal>
+    </div>
   </div>
 </template>
 
 <script>
 import { series } from 'async'
+import BasicTutorials from '~/components/BasicTutorials'
 
 export default {
-  components: {},
+  components: {
+    BasicTutorials
+  },
   data() {
     return {
       variant0: 'secondary',

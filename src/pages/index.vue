@@ -1,8 +1,11 @@
 <template>
   <div>
-    <h1 class="title">
-      nem2-eth-atomic-swap
-    </h1>
+    <div class="d-flex justify-content-between align-items-center">
+      <h1 class="title">
+        nem2-eth-atomic-swap
+      </h1>
+      <BasicTutorials />
+    </div>
     <h5>NEM</h5>
     <ul>
       <li>
@@ -57,8 +60,12 @@
 </template>
 
 <script>
+import BasicTutorials from '../components/BasicTutorials'
+
 export default {
-  components: {},
+  components: {
+    BasicTutorials
+  },
   computed: {
     nemEndpoint() {
       return process.env.nemEndpoint

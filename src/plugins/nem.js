@@ -94,7 +94,7 @@ export default ({ app, store }, inject) => {
       const deadLine = Deadline.create()
       const mosaic = new Mosaic(
         new MosaicId(process.env.xemMosaicHexId),
-        UInt64.fromUint(100000)
+        UInt64.fromUint(1)
       )
       const duration = UInt64.fromUint(1000)
       const hashType = HashType.Op_Keccak_256

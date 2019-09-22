@@ -1,6 +1,9 @@
 <template>
   <div>
-    <h1 class="title">Account Settings ({{ role }} Role)</h1>
+    <div class="d-flex justify-content-between align-items-center">
+      <h1 class="title">Account Settings ({{ role }} Role)</h1>
+      <BasicTutorials />
+    </div>
     <p>
       <b-button variant="secondary" size="sm" @click="usePreset"
         >Use Preset</b-button
@@ -186,8 +189,12 @@
 </template>
 
 <script>
+import BasicTutorials from '../components/BasicTutorials'
+
 export default {
-  components: {},
+  components: {
+    BasicTutorials
+  },
   data() {
     return {
       nemPrivateKey: '',

@@ -1,8 +1,11 @@
 <template>
   <div>
-    <h1 class="title">
-      Select Role
-    </h1>
+    <div class="d-flex justify-content-between align-items-center">
+      <h1 class="title">
+        Select Role
+      </h1>
+      <BasicTutorials />
+    </div>
     <div class="d-flex">
       <b-card title="Alice" style="max-width: 20rem;" class="mb-2">
         <b-card-text>
@@ -33,14 +36,19 @@
       </div>
       <div class="mt-3">
         <b-button variant="outline-secondary" to="/">Back</b-button>
-        <b-button variant="outline-primary" @click="submit">Next</b-button>
+        <b-button variant="outline-primary" to="/step1">Next</b-button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import BasicTutorials from '../components/BasicTutorials'
+
 export default {
+  components: {
+    BasicTutorials
+  },
   data() {
     return {
       selected: ''
@@ -54,10 +62,6 @@ export default {
   mounted() {
     this.selected = 'Alice'
   },
-  methods: {
-    submit() {
-      this.$router.push(`${this.selected.toLowerCase()}/step1`)
-    }
-  }
+  methods: {}
 }
 </script>
