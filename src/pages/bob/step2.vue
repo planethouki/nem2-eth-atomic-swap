@@ -263,7 +263,7 @@ export default {
             'setProof',
             result.preImage.substr(2).toUpperCase()
           )
-          this.hash3 = result.transactionHash
+          this.hash3 = result.hash
           this.variant3 = 'success'
           this.message3 = 'Confirmed.'
           done()

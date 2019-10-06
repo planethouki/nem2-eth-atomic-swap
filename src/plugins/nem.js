@@ -196,7 +196,7 @@ export default ({ app, store }, inject) => {
         secret: ''
       }
       const recipient = Address.createFromRawAddress(recipientAddress)
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 1000; i++) {
         const accountHttp = new AccountHttp(
           process.env.nemEndpoint,
           new NetworkHttp(process.env.nemEndpoint)
