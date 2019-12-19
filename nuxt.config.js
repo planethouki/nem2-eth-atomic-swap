@@ -73,7 +73,7 @@ export default {
         '25B3F54217340F7061D02676C4B928ADB4395EB70A2A52D2A11E2F4AE011B03E',
       ethPrivateKey:
         '0x25b3f54217340f7061d02676c4b928adb4395eb70a2a52d2a11e2f4ae011b03e',
-      cpNemAddress: 'SBWUUQYUPEVBZSQ3DQOPAZM2IPET7UY6TGPXPX34',
+      cpNemAddress: 'TCJG5TRMPH5R4AVO2S5A5XQFI3LBEVF5QA4A2ZA3',
       cpEthAddress: '0x608f801a3ebf472c0a6503750d7829f4deebcfcd'
     },
     bob: {
@@ -81,17 +81,17 @@ export default {
         '1B31F0BBB87891E747501C2B79103F986BD6F0B12B892EB0ACFB78ADBF9B3DF1',
       ethPrivateKey:
         '0x1b31f0bbb87891e747501c2b79103f986bd6f0b12b892eb0acfb78adbf9b3df1',
-      cpNemAddress: 'SCA7ZS2B7DEEBGU3THSILYHCRUR32YYE55ZBLYA2',
+      cpNemAddress: 'TDYF3QKKPYMXTGZODND6X3O5FLVB3GBYMFQG4PEU',
       cpEthAddress: '0xd11690c03f36cf220f9a4fbbcfc1658f306e4c6a'
     },
     ethEndpoint:
       'https://ropsten.infura.io/v3/d3469136f14f4deaafabfaf7e7c0d389',
-    nemEndpoint: 'https://elephant2.48gh23s.xyz:3001',
-    xemMosaicHexId: '6DE471A241E7AC7C',
+    nemEndpoint: 'https://test-api.48gh23s.xyz:3001',
+    xemMosaicHexId: '75AF035421401EF0',
     nemGenerationHash:
-      '43AE99FE757451CCF50E5CB372828254CD2CA2B91CBA61F11A2A1C031C09FE15',
+      'CC42AAD7BD45E8C276741AB2524BC30F5529AF162AD12247EF9A98D6B54A385B',
     ethSwapContractAddress: '0x21C0750C4bb2b38c52D997A06EAcBc7Dc48b90eE',
     ethExplorerTxUrl: 'https://ropsten.etherscan.io/tx',
-    nemExplorerTxUrl: 'https://elephant2.48gh23s.xyz:3001/transaction'
+    nemExplorerTxUrl: 'https://test-api.48gh23s.xyz:3001/transaction'
   }
 }

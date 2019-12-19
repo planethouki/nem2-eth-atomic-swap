@@ -10,7 +10,7 @@
     <ul>
       <li>
         Network :
-        <span class="badge badge-nem">Private</span>
+        <span class="badge badge-nem">Testnet</span>
       </li>
       <li>
         Endpoint :
@@ -20,7 +20,7 @@
         Block Explorer :
         <a
           class="badge badge-nem"
-          href="http://explorer48gh23s.z31.web.core.windows.net/?host=elephant2.48gh23s.xyz:3000#/blocks/0"
+          href="http://explorer.nemtech.network/"
           target="_blank"
         >
           here

@@ -7,7 +7,6 @@ import {
   Listener,
   Mosaic,
   MosaicId,
-  NetworkHttp,
   NetworkType,
   SecretLockTransaction,
   SecretProofTransaction,
@@ -32,7 +31,7 @@ export default ({ app, store }, inject) => {
     },
     isPrivateKeyValid(privateKeyString) {
       try {
-        Account.createFromPrivateKey(privateKeyString, NetworkType.MIJIN_TEST)
+        Account.createFromPrivateKey(privateKeyString, NetworkType.TEST_NET)
         return true
       } catch (e) {
         return false
@@ -49,7 +48,7 @@ export default ({ app, store }, inject) => {
     privateKeyToAddress(privateKeyString) {
       return Account.createFromPrivateKey(
         privateKeyString,
-        NetworkType.MIJIN_TEST
+        NetworkType.TEST_NET
       ).address.plain()
     },
     keccac256(hex) {
@@ -65,8 +64,10 @@ export default ({ app, store }, inject) => {
         .toUpperCase()
     },
     getXemBalance(addressString) {
-      const networkHttp = new NetworkHttp(process.env.nemEndpoint)
-      const accountHttp = new AccountHttp(process.env.nemEndpoint, networkHttp)
+      const accountHttp = new AccountHttp(
+        process.env.nemEndpoint,
+        NetworkType.TEST_NET
+      )
       return accountHttp
         .getAccountInfo(Address.createFromRawAddress(addressString))
         .toPromise()
@@ -99,7 +100,7 @@ export default ({ app, store }, inject) => {
       const duration = UInt64.fromUint(1000)
       const hashType = HashType.Op_Keccak_256
       const recipient = Address.createFromRawAddress(recipientAddress)
-      const networkType = NetworkType.MIJIN_TEST
+      const networkType = NetworkType.TEST_NET
       const maxFee = UInt64.fromUint(200000)
       const secretLockTransaction = SecretLockTransaction.create(
         deadLine,
@@ -122,7 +123,7 @@ export default ({ app, store }, inject) => {
     },
     sendSecretProof() {
       const privateKey = store.state.nemPrivateKey
-      const networkType = NetworkType.MIJIN_TEST
+      const networkType = NetworkType.TEST_NET
       const account = Account.createFromPrivateKey(privateKey, networkType)
       const proof = store.state.proof
       const secret = store.state.secret
@@ -199,13 +200,15 @@ export default ({ app, store }, inject) => {
       for (let i = 0; i < 1000; i++) {
         const accountHttp = new AccountHttp(
           process.env.nemEndpoint,
-          new NetworkHttp(process.env.nemEndpoint)
+          NetworkType.TEST_NET
         )
         const transactions = await accountHttp
           .getAccountInfo(recipient)
           .pipe(
             mergeMap((accountInfo) => {
-              return accountHttp.incomingTransactions(accountInfo.publicAccount)
+              return accountHttp.getAccountIncomingTransactions(
+                accountInfo.publicAccount.address
+              )
             })
           )
           .toPromise()
@@ -214,7 +217,7 @@ export default ({ app, store }, inject) => {
             return transaction.type === TransactionType.SECRET_LOCK
           })
           .filter((transaction) => {
-            return transaction.recipient.equals(recipient)
+            return transaction.recipientAddress.equals(recipient)
           })
           .filter((transaction) => {
             return transaction.secret === secret
@@ -234,13 +237,15 @@ export default ({ app, store }, inject) => {
       for (let i = 0; i < 1000; i++) {
         const accountHttp = new AccountHttp(
           process.env.nemEndpoint,
-          new NetworkHttp(process.env.nemEndpoint)
+          NetworkType.TEST_NET
         )
         const transactions = await accountHttp
           .getAccountInfo(recipient)
           .pipe(
             mergeMap((accountInfo) => {
-              return accountHttp.incomingTransactions(accountInfo.publicAccount)
+              return accountHttp.getAccountIncomingTransactions(
+                accountInfo.publicAccount.address
+              )
             })
           )
           .toPromise()
@@ -249,7 +254,7 @@ export default ({ app, store }, inject) => {
             return transaction.type === TransactionType.SECRET_PROOF
           })
           .filter((transaction) => {
-            return transaction.recipient.equals(recipient)
+            return transaction.recipientAddress.equals(recipient)
           })
           .filter((transaction) => {
             return transaction.secret === secret
