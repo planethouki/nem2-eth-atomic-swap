@@ -195,6 +195,11 @@ export default {
   components: {
     BasicTutorials
   },
+  asyncData({ store, redirect }) {
+    if (store.state.role === null) {
+      redirect('/role')
+    }
+  },
   data() {
     return {
       nemPrivateKey: '',
@@ -338,11 +343,6 @@ export default {
         this.checkNext()
         this.cpEthLoading = false
       }
-    }
-  },
-  asyncData({ store, redirect }) {
-    if (store.state.role === null) {
-      redirect('/role')
     }
   },
   methods: {

@@ -166,6 +166,14 @@ export default {
   components: {
     BasicTutorials
   },
+  asyncData({ store, redirect }) {
+    if (store.state.role === null) {
+      redirect('/role')
+    }
+    if (!store.getters.isFilledPrivateKeyAndAddress) {
+      redirect('/alice/step1')
+    }
+  },
   data() {
     return {
       variant0: 'secondary',
@@ -189,14 +197,6 @@ export default {
   computed: {
     role() {
       return this.$store.state.role
-    }
-  },
-  asyncData({ store, redirect }) {
-    if (store.state.role === null) {
-      redirect('/role')
-    }
-    if (!store.getters.isFilledPrivateKeyAndAddress) {
-      redirect('/alice/step1')
     }
   },
   mounted() {
@@ -238,6 +238,7 @@ export default {
             (error, transactionHash) => {
               if (error) {
                 this.message2 = error.toString()
+                // eslint-disable-next-line no-console
                 console.error(error)
                 this.variant2 = 'danger'
                 done(error)

@@ -42,6 +42,7 @@ export default ({ app }, inject) => {
             fromBlock: currentBlockNumber - 1000
           },
           (error) => {
+            // eslint-disable-next-line no-console
             if (error) console.error(error)
           }
         )
@@ -95,6 +96,7 @@ export default ({ app }, inject) => {
             }
           },
           (error) => {
+            // eslint-disable-next-line no-console
             if (error) console.error(error)
           }
         )
