@@ -9,15 +9,16 @@ jobs:
     steps:
       - uses: actions/checkout@master
 
-      - name: Install
-        uses: actions/npm@master
+      - name: setup node
+        uses: actions/setup-node@v1
         with:
-          args: install
+          node-version: '10.16'
 
-      - name: Generate
-        uses: actions/npm@master
-        with:
-          args: run generate
+      - name: install
+        run: npm install
+
+      - name: install
+        run: npm run generate
 
       - name: AzureLogin
         uses: Azure/github-actions/login@master
