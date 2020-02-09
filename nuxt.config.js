@@ -87,11 +87,11 @@ export default {
     ethEndpoint:
       'https://ropsten.infura.io/v3/d3469136f14f4deaafabfaf7e7c0d389',
     nemEndpoint: 'https://test-api.48gh23s.xyz:3001',
-    xemMosaicHexId: '75AF035421401EF0',
+    xemMosaicHexId: '51A99028058245A8',
     nemGenerationHash:
-      'CC42AAD7BD45E8C276741AB2524BC30F5529AF162AD12247EF9A98D6B54A385B',
+      '45870419226A7E51D61D94AD728231EDC6C9B3086EF9255A8421A4F26870456A',
     ethSwapContractAddress: '0x21C0750C4bb2b38c52D997A06EAcBc7Dc48b90eE',
     ethExplorerTxUrl: 'https://ropsten.etherscan.io/tx',
-    nemExplorerTxUrl: 'https://test-api.48gh23s.xyz:3001/transaction'
+    nemExplorerTxUrl: 'http://explorer-xym.nemtech.network/transaction'
   }
 }

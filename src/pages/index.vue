@@ -20,7 +20,7 @@
         Block Explorer :
         <a
           class="badge badge-nem"
-          href="http://explorer.nemtech.network/"
+          href="http://explorer-xym.nemtech.network/"
           target="_blank"
         >
           here
