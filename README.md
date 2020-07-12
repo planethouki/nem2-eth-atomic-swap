@@ -1,10 +1,8 @@
 # nem2-eth-atomic-swap
 
-catapult(testnet)-ethereum(ropsten) atomic swap simple web ui
+catapult(fushicho4)-ethereum(ropsten) atomic swap simple web ui
 
 do not use for mainnet or production
-
-[demo](https://nem2eth.z19.web.core.windows.net)
 
 ## Resources
 
