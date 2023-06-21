@@ -18,7 +18,7 @@
     "ethereumjs-wallet": "^0.6.3",
     "js-sha3": "^0.8.0",
     "nem2-sdk": "^0.16.0",
-    "nuxt": "^2.11.0",
+    "nuxt": "^3.4.3",
     "rxjs": "^6.5.3",
     "secure-random": "^1.1.2",
     "web3": "^1.2.4"
